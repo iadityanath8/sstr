@@ -5,9 +5,9 @@
 #include "../include/sstr.h"
 /***
  *
- *  [--------  _________]
+ *  [-------- _________]
  *            
- *             ^ start of char array
+ *   ^        ^ start of char array
  * ****/
 sstr builder(const char* charray){
   size_t len = strlen(charray);

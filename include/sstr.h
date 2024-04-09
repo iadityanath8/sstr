@@ -15,6 +15,12 @@
 #define SSTR_SEED_SIZE 2
 #define SSTRINLINE __attribute__((always_inline))
 
+/********* MACROS FOR MAKING LIFE EASY **********/
+
+#define len(x) sstr_len(x)
+#define cap(x) sstr_cap(x)
+#define SB(x) builder(x)
+
 typedef struct{
   size_t len;
   size_t cap;
