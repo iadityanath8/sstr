@@ -60,8 +60,9 @@ To use the SSTR library in your C project, follow these steps:
 - **Documentation**: Improve existing documentation or add new documentation to clarify usage, features, or contributions.
 - **Testing**: Ensure your changes are tested thoroughly. Add new tests if necessary and make sure all existing tests pass.
 
+## MIT License
 
-# MIT License
+Copyright (c) [2024] [nemesisdrX]
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
