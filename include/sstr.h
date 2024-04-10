@@ -16,10 +16,12 @@
 #define SSTRINLINE __attribute__((always_inline))
 
 /********* MACROS FOR MAKING LIFE EASY **********/
+/********* Will be making MACROS name more catchy soon ******/
 
 #define len(x) sstr_len(x)
 #define cap(x) sstr_cap(x)
 #define SB(x) builder(x)
+#define EQ(X,Y) sstr_eq(X,Y)
 
 typedef struct{
   size_t len;
@@ -41,7 +43,7 @@ size_t sstr_cap(sstr __s) __attribute__((nonnull(1)));
 void sstr_set_len(sstr __s,size_t len_value) __attribute__((nonnull(1)));
 void sstr_set_cap(sstr __s,size_t cap_value) __attribute__((nonnull(1)));
 void sstr_free(sstr __s) __attribute__((nonnull(1)));
-
+bool sstr_eq(sstr __s, sstr __b) __attribute__((nonnull(1,2)));
 /***
  *
  *  

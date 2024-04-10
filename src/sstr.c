@@ -47,6 +47,23 @@ void sstr_free(sstr __s){
   free(header);
 }
 
+bool sstr_eq(sstr __s,sstr __b){
+  assert(__s != NULL && __b != NULL);
+  auto len_s = sstr_len(__s);
+
+  if(sstr_len(__s) != sstr_len(__b)) return false;
+  
+  size_t i = 0;
+  
+  while(i < sstr_len(__s)){
+    if(__s[i] != __b[i]){
+      return false;
+    }
+    i++;
+  }
+  return true;
+}
+
 /***
  *
  *  
@@ -113,10 +130,6 @@ void sstr_cat(sstr dest[static 1], sstr src){
   }
 }
 
-sstr* split(sstr s[static 1]){
-   unimplemented
-}
-
 sstr sstr_dup(sstr __s){
   sstr a = builder("");  
 
@@ -127,16 +140,32 @@ sstr sstr_dup(sstr __s){
   return a;
 }
 
+sstr* sstr_split(sstr s,const char delim__){
+  /////// returns an alloced array of sstr string value 
+  
+  /***
+   *
+   *        SOON WE WILL HAVE THE TRACING GC RELATED TO SSTR STRING ONLY 
+   *        SO THAT WE CAN REMOVE THE UNNECCESARY FREE CALLS 
+   *
+   */
+  
+  unimplemented
+}
+
 sstr sstr_move(sstr __s){
-   
+  ////   
   unimplemented;
 }
 
-#if 0
-int main(){
+#if 1
+int main() {
+  sstr a =SB("MEOW");
+  sstr b = SB("MEOP");
 
   return 0;
 }
+
 #endif
 
 
