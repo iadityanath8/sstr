@@ -44,6 +44,9 @@ void sstr_set_len(sstr __s,size_t len_value) __attribute__((nonnull(1)));
 void sstr_set_cap(sstr __s,size_t cap_value) __attribute__((nonnull(1)));
 void sstr_free(sstr __s) __attribute__((nonnull(1)));
 bool sstr_eq(sstr __s, sstr __b) __attribute__((nonnull(1,2)));
+//sstr sstr_chr(sstr a,const char de); __attribute__((nonnull(1)));
+
+
 /***
  *
  *  
@@ -60,7 +63,8 @@ void sstr_append_cstr(sstr a[static 1],const char* val) __attribute__((nonnull(1
 
 void sstr_cat(sstr dest[static 1], sstr src)__attribute__((nonnull(1)));
 
-sstr* split(sstr __s[static 1]) __attribute__((nonnull(1)));
+/***********************      Deprecated       ********************/
+void split(sstr __s[static 1]) __attribute__((nonnull(1)));
 
 sstr sstr_dup(sstr __s) __attribute__((nonnull(1)));
 

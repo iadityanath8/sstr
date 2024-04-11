@@ -89,7 +89,7 @@ sstr sstr_reallocate(sstr a,ssize_t relseed){
   return new_string;
 }
 
-
+/** Pointer Semantics **/
 void sstr_append_char(sstr a[static 1],char val){
   auto len = sstr_len(*a);
   auto cap = sstr_cap(*a);
@@ -130,6 +130,10 @@ void sstr_cat(sstr dest[static 1], sstr src){
   }
 }
 
+void sstr_cat_cstr(sstr dest[static 1],const char* chr){
+  unimplemented
+}
+
 sstr sstr_dup(sstr __s){
   sstr a = builder("");  
 
@@ -140,7 +144,15 @@ sstr sstr_dup(sstr __s){
   return a;
 }
 
-sstr* sstr_split(sstr s,const char delim__){
+void sstr_buff_print(sstr* dest,sstr src,size_t nmenb){
+  for(int i =0;i < nmenb;i++){
+    sstr_append_char(dest,src[i]);
+  }
+}
+
+
+/*****************    Deprecated    **********************/
+void sstr_split(sstr s,const char delim__){
   /////// returns an alloced array of sstr string value 
   
   /***
@@ -148,9 +160,50 @@ sstr* sstr_split(sstr s,const char delim__){
    *        SOON WE WILL HAVE THE TRACING GC RELATED TO SSTR STRING ONLY 
    *        SO THAT WE CAN REMOVE THE UNNECCESARY FREE CALLS 
    *
-   */
+   ***/
   
-  unimplemented
+  sstr p_start = s;
+  auto p_len = sstr_len(p_start);
+  
+  int re_i = 0;
+  int i =0;
+  int encounter = 0;
+  
+  sstr token_mem;// = SB("");  /// allocation in here 
+  while(i < p_len){
+    if(p_start[i] == delim__){
+      token_mem = SB("");
+      // need a function like sstr_buf_print 
+      sstr_buff_print(&token_mem,p_start + encounter,i - encounter);
+      printf("%s\n",token_mem);
+   //   ret_val[re_i] = sstr_dup(token_mem);
+   //   re_i++;
+      encounter = i + 1;
+      sstr_free(token_mem);
+    }
+    i++;
+  }
+
+  token_mem = SB("");
+  
+  sstr_buff_print(&token_mem,p_start + encounter,i - encounter - 1);
+  //printf("%d\n",(i - encounter));
+  //printf("iL%c\n",*(p_start + encounter + 17));
+  printf("%s\n",token_mem);
+  sstr_free(token_mem);
+  
+  //  ret_val[re_i] = sstr_dup(token_mem);
+  //  re_i++;
+}
+
+
+ssize_t sstr_chr(sstr a,const char de){
+  for(int i = 0; i < sstr_len(a);i++){
+    if(de == a[i]){
+      return i;
+    }
+  }
+  return -1;
 }
 
 sstr sstr_move(sstr __s){
@@ -158,14 +211,21 @@ sstr sstr_move(sstr __s){
   unimplemented;
 }
 
-#if 1
+#if 0
 int main() {
-  sstr a =SB("MEOW");
+  sstr a = SB("MEOW");
   sstr b = SB("MEOP");
 
   return 0;
 }
-
 #endif
 
-
+#if 1
+int main(){
+  sstr a = SB("MEOW,MMEW , Hyderabad in here");
+  sstr_split(a,',');
+  
+  sstr_free(a);
+  return 0;
+}
+#endif
