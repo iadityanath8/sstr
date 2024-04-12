@@ -1,231 +1,189 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <assert.h>
 #include <stdbool.h>
-#include <string.h>   /* Dependency is questioning */
 #include "../include/sstr.h"
-/***
- *
- *  [-------- _________]
- *            
- *   ^        ^ start of char array
- * ****/
-sstr builder(const char* charray){
-  size_t len = strlen(charray);
-  auto header = (header_t*)malloc(sizeof(header_t) + sizeof(char)*(len + DEFAULT_CAP_SIZE + 1));
-  header->len = len;
-  header->cap = len + DEFAULT_CAP_SIZE;
-  
-  auto __str = ((char*)header) + sizeof(header_t);
 
-  strncpy(__str,charray,len);
+
+sstr sstr_new(const char* cstr){
+  auto p_len = strlen(cstr); 
+
+  auto header = ALLOC_SSTR(p_len);
   
-  return (sstr)__str;
+  header->cap = p_len + INIT_CAP_SIZE;     // Dangerous
+  header->len = p_len;
+  header->st = 0;
+  header->ed = p_len;
+
+  auto __p_str = GET_STRING(header);
+  
+  strncpy(__p_str,cstr,p_len + 1);
+  return __p_str;
 }
 
-size_t sstr_len(sstr __s){
-  auto header = (header_t*)((char*)__s - sizeof(header_t));
+sstr sstr_empty(){
+  auto header = ALLOC_SSTR(0);
+  
+  header->len = 0;
+  header->cap = INIT_CAP_SIZE;
+  header->st = 0;
+  header->ed = 0;
+  auto __str_val = GET_STRING(header);
+  
+  strncpy(__str_val,"",0 + 1);
+
+  return GET_STRING(header);
+}
+
+size_t sstr_len(sstr __a){
+  auto header = GET_HEADER(__a);
+  
+#if XPRIMENT
+  if(header->ed - header->st == header->len){
+    return header->ed - header->st;
+  } else{
+    return header->ed - header->st;
+  }
+#endif
   return header->len;
 }
 
-size_t sstr_cap(sstr __s){
-  auto header = (header_t*)((char*)__s - sizeof(header_t));
+size_t sstr_cap(sstr __a){
+  auto header = GET_HEADER(__a);
   return header->cap;
 }
 
-void sstr_set_len(sstr __s,size_t len_value){
-  auto header = (header_t*)((char*)__s - sizeof(header_t));
-  header->len = len_value;
+void sstr_set_len(sstr __s,size_t len){
+  auto header = GET_HEADER(__s);
+#if XPRIMENT
+  if(header->ed - header->st == header->len){
+    header->ed = len;
+  }else{
+    unimplemented
+  }
+  header->len = header->ed - header->st;
+#endif
+  header->len = len;
 }
 
-void sstr_set_cap(sstr __s,size_t cap_value){
-  auto header = (header_t*)((char*)__s - sizeof(header_t));
-  header->cap = cap_value;
+void sstr_set_cap(sstr __s,size_t cap){
+  auto header = GET_HEADER(__s);
+  header->cap = cap;
 }
 
-void sstr_free(sstr __s){
-  auto header = (header_t*)((char*)__s - sizeof(header_t));
+void sstr_free(sstr _a){
+  assert(_a != NULL);
+  
+  auto header = GET_HEADER(_a);
+   
   free(header);
+  header = NULL;
 }
 
-bool sstr_eq(sstr __s,sstr __b){
-  assert(__s != NULL && __b != NULL);
-  auto len_s = sstr_len(__s);
+static inline sstr sstr_reallocate(sstr a){
+  auto len = sstr_len(a);
+  auto cap = sstr_cap(a);
+  
+  auto header = GET_HEADER(a);
+#if Dangerous
+  if(len + 2 == cap){
 
-  if(sstr_len(__s) != sstr_len(__b)) return false;
-  
-  size_t i = 0;
-  
-  while(i < sstr_len(__s)){
-    if(__s[i] != __b[i]){
-      return false;
-    }
-    i++;
   }
-  return true;
-}
-
-/***
- *
- *  
- *  Possibly doubling the capacity in here 
- *
- *
- * */
-
-sstr sstr_reallocate(sstr a,ssize_t relseed){
-  size_t len = sstr_len(a);
-  size_t cap = sstr_cap(a);
+#endif
+ 
+  auto new_header = (sstr_special_header_t*)
+                  realloc(header,sizeof(sstr_special_header_t) +
+                      sizeof(char)*(cap*INIT_GROW_SIZE + 1));
   
-  if(relseed == -1){
-    relseed = cap;
-  }
-  auto new_header = (header_t*)malloc(sizeof(header_t) + sizeof(char)*relseed*SSTR_SEED_SIZE);
+  new_header->cap = cap*INIT_GROW_SIZE;
   new_header->len = len;
-  new_header->cap = relseed*SSTR_SEED_SIZE;
-  auto new_string = (char*)new_header + sizeof(header_t);
-  strncpy(new_string,a,len); 
+  new_header->st = 0;
+  new_header->ed = len;
   
-  sstr_free(a);
-  return new_string;
+  auto ss = GET_STRING(new_header);
+  //printf("%s\n",ss);
+  
+  return ss;
 }
 
-/** Pointer Semantics **/
-void sstr_append_char(sstr a[static 1],char val){
-  auto len = sstr_len(*a);
-  auto cap = sstr_cap(*a);
-
-  if(len >= cap){
-    *a = sstr_reallocate(*a,-1);  
-    a[0][len] = val;
-    sstr_set_len(*a,len + 1);
+void sstr_append_char(sstr __s[static 1],char _app){
+  auto len = sstr_len(__s[0]);
+  auto cap = sstr_cap(__s[0]);
+  
+  if(len + 2 == cap){
+    __s[0] = sstr_reallocate(__s[0]);
+    __s[0][len] = _app;
   }else{
-    a[0][len] = val;
-    sstr_set_len(*a,len + 1);
+    __s[0][len] = _app;
+  }
+  
+  __s[0][len + 1] = '\0';
+  sstr_set_len(__s[0],len + 1);
+}
+
+void sstr_append_str(sstr a[static 1], const char* __a){
+  for(size_t i = 0;i < strlen(__a);i++){
+    sstr_append_char(a,__a[i]);
   }
 }
 
-void sstr_append_cstr(sstr a[static 1],const char* val){
-  auto c_len = strlen(val);
-  for(int i = 0;i < c_len;i++){
-    sstr_append_char(a,val[i]);
+void sstr_append_sstr(sstr a[static 1],sstr appender){
+  for(size_t i = 0;i < sstr_len(appender);i++){
+    sstr_append_char(a,appender[i]);
   }
 }
 
-void sstr_cat(sstr dest[static 1], sstr src){
-  auto len_dest = sstr_len(dest[0]);
-  auto len_src = sstr_len(src);
-  auto cap_dest = sstr_cap(dest[0]);
-
-  if(len_dest + len_src < cap_dest){
-    int i = 0;
-    while(i < len_src){
-      sstr_append_char(dest,src[i]);i++;
-    }
-  }else{
-    dest[0] = sstr_reallocate(dest[0],len_dest + len_src);
-    int i = 0;
-    while(i < len_src){
-      sstr_append_char(dest,src[i]);i++;
-    }
-  }
-}
-
-void sstr_cat_cstr(sstr dest[static 1],const char* chr){
-  unimplemented
-}
-
-sstr sstr_dup(sstr __s){
-  sstr a = builder("");  
-
-  auto __l = sstr_len(__s);
-  strncpy(a,__s,__l);
-  
-  sstr_set_len(a,__l);
-  return a;
-}
-
-void sstr_buff_print(sstr* dest,sstr src,size_t nmenb){
-  for(int i =0;i < nmenb;i++){
-    sstr_append_char(dest,src[i]);
-  }
-}
-
-
-/*****************    Deprecated    **********************/
-void sstr_split(sstr s,const char delim__){
-  /////// returns an alloced array of sstr string value 
-  
-  /***
-   *
-   *        SOON WE WILL HAVE THE TRACING GC RELATED TO SSTR STRING ONLY 
-   *        SO THAT WE CAN REMOVE THE UNNECCESARY FREE CALLS 
-   *
-   ***/
-  
-  sstr p_start = s;
-  auto p_len = sstr_len(p_start);
-  
-  int re_i = 0;
-  int i =0;
-  int encounter = 0;
-  
-  sstr token_mem;// = SB("");  /// allocation in here 
-  while(i < p_len){
-    if(p_start[i] == delim__){
-      token_mem = SB("");
-      // need a function like sstr_buf_print 
-      sstr_buff_print(&token_mem,p_start + encounter,i - encounter);
-      printf("%s\n",token_mem);
-   //   ret_val[re_i] = sstr_dup(token_mem);
-   //   re_i++;
-      encounter = i + 1;
-      sstr_free(token_mem);
-    }
-    i++;
-  }
-
-  token_mem = SB("");
-  
-  sstr_buff_print(&token_mem,p_start + encounter,i - encounter - 1);
-  //printf("%d\n",(i - encounter));
-  //printf("iL%c\n",*(p_start + encounter + 17));
-  printf("%s\n",token_mem);
-  sstr_free(token_mem);
-  
-  //  ret_val[re_i] = sstr_dup(token_mem);
-  //  re_i++;
-}
-
-
-ssize_t sstr_chr(sstr a,const char de){
-  for(int i = 0; i < sstr_len(a);i++){
-    if(de == a[i]){
+bool sstr_find(sstr a,const char delim){
+  for(size_t i = 0;i < sstr_len(a);i++){
+    if(delim == a[i]){
       return i;
     }
   }
   return -1;
 }
 
-sstr sstr_move(sstr __s){
-  ////   
-  unimplemented;
+bool sstr_eq(sstr a,sstr b){
+  auto a_len = sstr_len(a);
+  auto b_len = sstr_len(b);
+
+  if(a_len != b_len){return false;}
+  return !strncmp(a,b,a_len);
 }
 
-#if 0
-int main() {
-  sstr a = SB("MEOW");
-  sstr b = SB("MEOP");
-
-  return 0;
-}
-#endif
-
-#if 1
-int main(){
-  sstr a = SB("MEOW,MMEW , Hyderabad in here");
-  sstr_split(a,',');
+char sstr_at(sstr __a, ssize_t sidx){
+  auto __a_len = sstr_len(__a);
   
+   if(sidx >= (ssize_t)__a_len || 
+      sidx + __a_len >= __a_len){fprintf(stderr,"INDEX OUT OF BOUND"); exit(EXIT_FAILURE);}
+
+#if XPRIMENT
+  if(sidx < 0){
+    // sidx = -1
+    // len + sidx;
+    return __a[sidx + __a_len];
+  }
+  return __a[sidx];
+#endif
+  return __a[sidx];
+}
+
+char* view_chr(){
+  unimplemented
+}
+
+sstr* sstr_split(sstr __a,const char __delim){
+  unimplemented
+}
+
+int main(){
+  auto a = sstr_new("MEOW");
+  auto b = sstr_new("MEOW");   
+  
+
   sstr_free(a);
+  sstr_free(b);
   return 0;
 }
-#endif
+
+
