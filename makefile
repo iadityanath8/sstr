@@ -1,5 +1,9 @@
 CC = cc
 Cperf = -O3
+CFlags = -Wall -Wextra -pedantic -Wnonnull
+
+make_tests:
+	$(CC) $(CFlags) -o test ./test/test.c -L. -lsstr
 
 make_examples:
 	$(CC) $(Cperf) -o example ./examples/main.c -L. -lsstr 

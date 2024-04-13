@@ -1,73 +1,73 @@
-#ifndef SSTR_H
-#define SSTR_H
-
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <assert.h>
 #include <stdbool.h>
-#include <string.h>   /* Dependency is questioning */
 
-#define unimplemented do{\
-  assert(false && "NOT IMPLMENTED YET");\
-}while(0);
-#define auto __auto_type
-#define DEFAULT_CAP_SIZE 16
-#define SSTR_SEED_SIZE 2
-#define SSTRINLINE __attribute__((always_inline))
+#define GET_HEADER(x) (sstr_special_header_t*)((char*)x - sizeof(sstr_special_header_t))
+#define GET_STRING(x) (sstr)((char*)x + sizeof(sstr_special_header_t))
+#define ALLOC_SSTR(len) (sstr_special_header_t*)s_alloc(sizeof(sstr_special_header_t) + \
+                                        sizeof(char)*(len + 1 + INIT_CAP_SIZE));
 
-/********* MACROS FOR MAKING LIFE EASY **********/
-/********* Will be making MACROS name more catchy soon ******/
-
+#define S_EQ(x,y) sstr_eq(x,y)
+#define SB(x) sstr_new(x)
 #define len(x) sstr_len(x)
 #define cap(x) sstr_cap(x)
-#define SB(x) builder(x)
-#define EQ(X,Y) sstr_eq(X,Y)
+#define XPRIMENT 1
 
-typedef struct{
-  size_t len;
-  size_t cap;
-}header_t;
+#define unimplemented do{\
+  assert(false && "NOT IMPLEMENRTED");\
+}while(0);
+
+#define INIT_CAP_SIZE 2           /* ONLY FOR TESTING PURPOSE **/
+#define INIT_GROW_SIZE 2
+
+#ifndef s_alloc
+#define s_alloc malloc
+#endif
+
+
+#define auto __auto_type
+
 
 typedef char* sstr;
 
-/***
- *
- *  [--------  _________]
- *            
- *             ^ start of char array
- * ****/
-sstr builder(const char* charray);
+typedef struct{
+  size_t st;
+  size_t ed;
+  size_t len;
+  size_t cap;
+}sstr_special_header_t;
 
-size_t sstr_len(sstr __s) __attribute__((nonnull(1)));
-size_t sstr_cap(sstr __s) __attribute__((nonnull(1)));
-void sstr_set_len(sstr __s,size_t len_value) __attribute__((nonnull(1)));
-void sstr_set_cap(sstr __s,size_t cap_value) __attribute__((nonnull(1)));
-void sstr_free(sstr __s) __attribute__((nonnull(1)));
-bool sstr_eq(sstr __s, sstr __b) __attribute__((nonnull(1,2)));
-//sstr sstr_chr(sstr a,const char de); __attribute__((nonnull(1)));
+sstr sstr_new(const char* cstr);
+
+sstr sstr_empty();
+
+size_t sstr_len(sstr __a);
+
+size_t sstr_cap(sstr __a);
+
+void sstr_set_len(sstr __s,size_t len);
+
+void sstr_set_cap(sstr __s,size_t cap);
+void sstr_free(sstr _a);
+
+static inline sstr sstr_reallocate(sstr a);
+
+void sstr_append_char(sstr __s[static 1],char _app);
+
+void sstr_append_str(sstr a[static 1], const char* __a);
+
+void sstr_append_sstr(sstr a[static 1],sstr appender);
+
+bool sstr_find(sstr a,const char delim);
+
+bool sstr_eq(sstr a,sstr b);
+
+char sstr_at(sstr __a, ssize_t sidx);
+char* view_chr();
+
+sstr* sstr_split(sstr __a,const char __delim);
 
 
-/***
- *
- *  
- *  Possibly doubling the capacity in here 
- *  can change the capacity after doubling it 
- *  soon custom allocator option will be given to te user
- *
- * */
-sstr sstr_reallocate(sstr a,ssize_t relseed) __attribute__((nonnull(1)));
 
-void sstr_append_char(sstr a[static 1],char val) __attribute__((nonnull(1)));
-
-void sstr_append_cstr(sstr a[static 1],const char* val) __attribute__((nonnull(1)));
-
-void sstr_cat(sstr dest[static 1], sstr src)__attribute__((nonnull(1)));
-
-/***********************      Deprecated       ********************/
-void split(sstr __s[static 1]) __attribute__((nonnull(1)));
-
-sstr sstr_dup(sstr __s) __attribute__((nonnull(1)));
-
-sstr sstr_move(sstr __s) __attribute__((nonnull(1)));
-
-#endif
