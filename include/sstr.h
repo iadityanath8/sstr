@@ -78,7 +78,7 @@ void sstr_free(sstr _a);
 
 sstr sstr_reallocate(sstr a);
 sstr sstr_ensure_capacity(sstr a,size_t len);
-
+sstr sstr_dup(sstr __s);
 void sstr_append_char(sstr __s[static 1],char _app);
 
 void sstr_append_str(sstr a[static 1], const char* __a);

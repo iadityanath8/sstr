@@ -6,6 +6,16 @@
 #include <ctype.h>
 #include "../include/sstr.h"
 
+/****
+ *
+ *
+ *
+ *      Introducing SSO 
+ *      memory sso to store header and rest remaining string buffer 
+ *
+ ***/
+
+#define SSO_MEMORY 1000
 
 sstr sstr_new(const char* cstr){
   auto p_len = strlen(cstr); 
@@ -170,13 +180,14 @@ sstr sstr_cat(sstr _a,sstr _b){
   return b;
 }
 
+/**         Issue in here          */
 bool sstr_find(sstr a,const char delim){
   for(size_t i = 0;i < sstr_len(a);i++){
     if(delim == a[i]){
-      return i;
+      return true;
     }
   }
-  return -1;
+  return false;
 }
 
 bool sstr_eq(sstr a,sstr b){
@@ -300,7 +311,7 @@ void sstr_freeList(sstr* fp,size_t len){
   free(fp);
 }
 
-#if 1
+#if 0
 int main(){
   auto a = sstr_empty();
   printf("%ld\n",sstr_cap(a));
