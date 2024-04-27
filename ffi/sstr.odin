@@ -1,28 +1,30 @@
-package main
+package sstr
 
 import "core:c"
 import "core:fmt"
 
 foreign import s "../libsstr.a"
 
+/** Semantic difference  **/ 
+sstr :: distinct cstring
 
 @(link_prefix = "sstr_")
 foreign s{
-    new :: proc(a : cstring) -> cstring ---
-    len :: proc(a: cstring) -> c.size_t ---
-    cap :: proc(a :cstring) -> c.size_t ---
-    // sstr_reallocate :: proc(a :[^]c.char) -> [^]c.char---
-    append_char :: proc(a:^cstring,b: c.char) ---
-    append_str :: proc(a:^cstring,b:cstring) ---
-    append_sstr :: proc(a:^cstring, b:cstring) ---
-    cat :: proc(a:cstring, b:cstring) -> cstring ---
-    dup :: proc(a:cstring) -> cstring ---;
-    find :: proc(a: cstring, b:rune) -> bool ---
-    eq :: proc(a: cstring,b:cstring) -> bool ---
-    at :: proc(a:cstring, idx: c.ssize_t) -> rune ---
-    split :: proc(a:cstring,d:rune,page_len:^c.size_t) -> [^]cstring ---
-    free :: proc(a:cstring) ---
-    freeList :: proc(p:[^]cstring, page_len: c.size_t) ---
+    new             :: proc(a:cstring) -> sstr ---
+    len             :: proc(a:sstr) -> c.size_t ---
+    cap             :: proc(a:sstr) -> c.size_t ---
+    sstr_reallocate :: proc(a :[^]c.char) -> [^]c.char---
+    append_char     :: proc(a:^sstr,b:c.char) ---
+    append_str      :: proc(a:^sstr,b:cstring) ---
+    append_sstr     :: proc(a:^sstr, b:cstring) ---
+    cat             :: proc(a:sstr, b:sstr) -> sstr ---
+    dup             :: proc(a:sstr) -> sstr ---;
+    find            :: proc(a:sstr, b:rune) -> bool ---
+    eq              :: proc(a:sstr,b:cstring) -> bool ---
+    at              :: proc(a:sstr, idx: c.ssize_t) -> rune ---
+    split           :: proc(a:sstr,d:rune,page_len:^c.size_t) -> [^]sstr ---
+    free            :: proc(a:sstr) ---
+    freeList        :: proc(p:[^]sstr, page_len: c.size_t) ---
 }
 
 s_free :: proc{free,freeList}
