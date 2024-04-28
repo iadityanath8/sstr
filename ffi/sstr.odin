@@ -13,7 +13,7 @@ foreign s{
     new             :: proc(a:cstring) -> sstr ---
     len             :: proc(a:sstr) -> c.size_t ---
     cap             :: proc(a:sstr) -> c.size_t ---
-    sstr_reallocate :: proc(a :[^]c.char) -> [^]c.char---
+    reallocate      :: proc(a :sstr) -> sstr ---
     append_char     :: proc(a:^sstr,b:c.char) ---
     append_str      :: proc(a:^sstr,b:cstring) ---
     append_sstr     :: proc(a:^sstr, b:cstring) ---
@@ -27,6 +27,7 @@ foreign s{
     freeList        :: proc(p:[^]sstr, page_len: c.size_t) ---
 }
 
+// explicit procedure overloading 
 s_free :: proc{free,freeList}
 
 main :: proc(){
