@@ -1,14 +1,14 @@
-FROM alpine:latest
-WORKDIR /app
+# FROM alpine:latest
+# WORKDIR /app
 
-COPY . .
+# COPY . .
 
-RUN apk add --no-cache gcc make libc-dev
+# RUN apk add --no-cache gcc make libc-dev
 
-RUN make make_linux
+# RUN make make_linux
 
-RUN cp include/sstr.h /usr/include/ 
+# RUN cp include/sstr.h /usr/include/ 
 
-RUN cp libsstr.a /usr/lib
+# RUN cp libsstr.a /usr/lib
 
 
