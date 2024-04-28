@@ -13,8 +13,8 @@ foreign s{
     new             :: proc(a:cstring) -> sstr ---
     len             :: proc(a:sstr) -> c.size_t ---
     cap             :: proc(a:sstr) -> c.size_t ---
-    reallocate      :: proc(a :sstr) -> sstr ---
-    append_char     :: proc(a:^sstr,b:c.char) ---
+    reallocate      :: proc(a:sstr) -> sstr ---
+    append_char     :: proc(a:^sstr,b:rune) ---
     append_str      :: proc(a:^sstr,b:cstring) ---
     append_sstr     :: proc(a:^sstr, b:cstring) ---
     cat             :: proc(a:sstr, b:sstr) -> sstr ---
