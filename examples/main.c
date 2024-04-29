@@ -20,7 +20,9 @@ int main(){
 
 int main(){
   sstr a = SB("BILLU");
-  sstr b = SB("MEOW");
   
+  sstr_append_char(&a,'L');
+  
+  printf("%s\n",a);
   return 0;
 }
